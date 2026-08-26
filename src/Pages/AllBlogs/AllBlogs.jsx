@@ -2,6 +2,7 @@ import BlogCard from "../../Shared/BlogCard";
 import { useContext, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { AuthContext } from "../../context/AuthProvider";
+import { BlogCardSkeletonGrid } from "../../Shared/Skeletons";
 
 
 const AllBlogs = () => {
@@ -9,19 +10,24 @@ const AllBlogs = () => {
     const { user } = useContext(AuthContext)
     const wishEmail = user?.email
     const [blogs, setBlogs] = useState([])
+    const [loading, setLoading] = useState(true)
     useEffect(() => {
-        fetch('https://y-eta-nine.vercel.app/blogs', {
+        setLoading(true)
+        fetch('https://international-blogs-server.vercel.app/blogs', {
             method: 'GET'
         })
             .then(res => res.json())
-            .then(data => setBlogs(data))
+            .then(data => {
+                setBlogs(data)
+                setLoading(false)
+            })
     }, [])
 
 
     const [wish, setWish] = useState(null)
     const handleWishlist = (id) => {
 
-        (fetch(`https://y-eta-nine.vercel.app/blogs/${id}`, {
+        (fetch(`https://international-blogs-server.vercel.app/blogs/${id}`, {
             method: 'GET'
         })
             .then(res => res.json())
@@ -33,7 +39,7 @@ const AllBlogs = () => {
     }
     useEffect(() => {
         if (wish !== null) {
-            fetch(`https://y-eta-nine.vercel.app/wishlist`, {
+            fetch(`https://international-blogs-server.vercel.app/wishlist`, {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
@@ -56,17 +62,19 @@ const AllBlogs = () => {
         }
     }, [wish])
 
-    const handleSearch = (e)=>{
+    const handleSearch = (e) => {
         e.preventDefault()
         const title = e.target.search.value.toLowerCase()
-        fetch(`https://y-eta-nine.vercel.app/blogs/searched/${title}`,{
-            method:'GET'
+        setLoading(true)
+        fetch(`https://international-blogs-server.vercel.app/blogs/searched/${title}`, {
+            method: 'GET'
         })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-           setBlogs(data)
-        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                setBlogs(data)
+                setLoading(false)
+            })
     }
 
     const handleDelete = id => {
@@ -79,7 +87,7 @@ const AllBlogs = () => {
         })
 
         if (confirm) {
-            fetch(`https://y-eta-nine.vercel.app/blogs/${id}`, {
+            fetch(`https://international-blogs-server.vercel.app/blogs/${id}`, {
                 method: 'DELETE'
             })
                 .then(res => res.json())
@@ -100,21 +108,33 @@ const AllBlogs = () => {
     }
 
     return (
-        <div>
-            <div>
-                <h2 className="text-3xl font-extrabold text-center lg:mb-10">Enjoy a Huge Collection <br /> of <br /> {blogs.length} Blog Posts</h2>
-                <form onSubmit={(e)=>handleSearch(e)} className="w-1/2 mx-auto md:mb-10 relative">
-                    <input className="input input-bordered w-full mt-3 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" type="search" name="search" id="" />
-                    <input className="absolute top-3 right-0 px-7 btn bg-gray-900 text-white" type="submit" value="Search" />
-                </form>
-
-                <div className="mx-auto ">
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 lg:gap-y-7 lg:gap-x-14">
-                        {
-                            blogs.map(blog => <BlogCard key={blog._id} blog={blog} handleDelete={handleDelete} handleWishlist={handleWishlist}></BlogCard>)
-                        }
-                    </div>
+        <div className="container mx-auto px-6 py-14">
+            <div className="border-b border-rule pb-10">
+                <p className="font-meta text-[11px] uppercase tracking-wide2 text-ink-faint">Archive</p>
+                <div className="mt-3 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                    <h1 className="font-display italic text-4xl lg:text-5xl text-ink">
+                        All Blogs <span className="text-ink-faint text-2xl not-italic">({blogs.length})</span>
+                    </h1>
+                    <form onSubmit={handleSearch} className="flex w-full max-w-sm border-b border-ink">
+                        <input className="w-full bg-transparent py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none" type="search" name="search" placeholder="Search articles" />
+                        <button type="submit" className="font-meta text-[11px] uppercase tracking-wide2 text-ink-soft hover:text-ink transition-colors">
+                            Search
+                        </button>
+                    </form>
                 </div>
+            </div>
+
+            <div className="mt-14">
+                {
+                    loading ?
+                        <BlogCardSkeletonGrid count={6} />
+                        :
+                        <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+                            {
+                                blogs.map(blog => <BlogCard key={blog._id} blog={blog} handleDelete={handleDelete} handleWishlist={handleWishlist}></BlogCard>)
+                            }
+                        </div>
+                }
             </div>
         </div>
     );

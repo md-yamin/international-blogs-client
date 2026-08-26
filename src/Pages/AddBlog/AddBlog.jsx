@@ -2,15 +2,17 @@ import { useContext } from 'react';
 import Swal from 'sweetalert2'
 import { AuthContext } from '../../context/AuthProvider';
 
+const categories = ['Animals', 'Anime', 'Comedy', 'Cartoon', 'Education', 'Entertainment', 'Fitness', 'Fashion', 'Food', 'Lifestyle', 'Music', 'Movies', 'Sports', 'Travel', 'Tech', 'Video Game']
+
+const fieldClass = "w-full border border-rule bg-paper px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-ink transition-colors"
+const labelClass = "font-meta text-[11px] uppercase tracking-wide2 text-ink-faint"
+
 const AddBlog = () => {
 
-    const bgStyle = { backgroundImage: 'url(https://i.ibb.co/w7PyjsY/5357377-Internet-go.jpg)', backgroundPosition: 'center',}
     const { user } = useContext(AuthContext)
     const userEmail = user?.email
     const userImg = user?.photoURL
     const time = new Date()
-   
-    // console.log(user.email);
 
     const handleAddBlog = e => {
         e.preventDefault()
@@ -27,7 +29,7 @@ const AddBlog = () => {
 
         const newBlog = { name, image, email, short_description, detailed_description, category, title, userEmail, userImg, time}
 
-        fetch('https://y-eta-nine.vercel.app/blogs', {
+        fetch('https://international-blogs-server.vercel.app/blogs', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -52,117 +54,101 @@ const AddBlog = () => {
     }
 
     return (
-        <div>
-            <section className="dark:bg-gray-100 dark:text-gray-900 bg-no-repeat" style={bgStyle}>
-                <div className=' bg-black bg-opacity-30'>
-                <form onSubmit={handleAddBlog} className=" container flex flex-col mx-auto space-y-12 p-4 lg:p-32 md:p-16">
-                    <div className="grid md:grid-cols-2 gap-10">
-                        
+        <div className="container mx-auto max-w-4xl px-6 py-14">
+            <p className="font-meta text-[11px] uppercase tracking-wide2 text-ink-faint">New Article</p>
+            <h1 className="mt-3 font-display italic text-4xl lg:text-5xl text-ink">Write a Blog</h1>
 
+            <form onSubmit={handleAddBlog} className="mt-12 space-y-12">
+
+                {/* Content: title is the primary act of writing, so it leads on its own */}
+                <div>
+                    <label htmlFor="title" className={labelClass}>Title</label>
+                    <input
+                        required
+                        name="title"
+                        id="title"
+                        type="text"
+                        placeholder="Give your article a title"
+                        className="mt-2 w-full border-b border-rule bg-transparent py-2 font-display text-3xl text-ink placeholder:text-ink-faint focus:outline-none focus:border-ink" />
+                </div>
+
+                <div className="grid gap-10 lg:grid-cols-3">
+                    {/* Main content column */}
+                    <div className="lg:col-span-2 space-y-8">
                         <div>
-                            <label htmlFor="image" className="text-xl font-bold mr-5">Image Url</label>
-                            <input
-                            required 
-                            name="image" 
-                            id="image" 
-                            type="text" 
-                            placeholder="Image Url" 
-                            className="input input-bordered w-full mt-3 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" />
-                        </div>
-
-
-
-                        <div>
-                            <label htmlFor="title" className="text-xl font-bold mr-5">Title</label>
-                            <input 
-                            required
-                            name="title" 
-                            id="title" 
-                            type="text" 
-                            placeholder="Title" 
-                            className="input input-bordered w-full mt-3 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" />
-                        </div>
-
-                        <div>
-                            <label htmlFor="User Name" className="text-xl font-bold mr-5">User Name</label>
-                            <input
-                            required 
-                            name="name" 
-                            id="user_name" 
-                            type="text" 
-                            placeholder="User Name" 
-                            className="input input-bordered w-full mt-3 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" />
-                        </div>
-
-                        
-                        <div>
-                            <label htmlFor="User Email" className="text-xl font-bold mr-5">User Email</label>
-                            <input 
-                            required
-                            name="email"
-                            id="email" type="email"
-                            defaultValue={user? user.email: "User Email"}
-                            className="input input-bordered w-full mt-3 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" />
-                        </div>
-
-                       
-
-
-
-                        <div>
-                            <label htmlFor="short description" className="text-xl font-bold mr-5">Short Description</label>
-                            <textarea 
-                            required
-                            name="short_description" 
-                            cols="50" 
-                            rows="10" 
-                            type="text" 
-                            placeholder="Short Description" 
-                            className="input input-bordered mt-3 h-28 w-full  focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" ></textarea>
-
+                            <label htmlFor="short_description" className={labelClass}>Short Description</label>
+                            <p className="text-xs text-ink-faint mt-1 mb-2">A one or two line summary shown on article cards.</p>
+                            <textarea
+                                required
+                                name="short_description"
+                                id="short_description"
+                                rows="3"
+                                placeholder="Short Description"
+                                className={fieldClass}></textarea>
                         </div>
 
                         <div>
-                            <label htmlFor="Detailed description" className="text-xl font-bold mr-5">Detailed Description</label>
-                            <textarea 
-                            required
-                            name="detailed_description" 
-                            cols="50" 
-                            rows="10" 
-                            type="text" 
-                            placeholder="Detailed Description" 
-                            className="input input-bordered mt-3 w-full  h-28 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" ></textarea>
-                        </div>
-
-                        <div>
-                            <label htmlFor="Category" className="text-xl font-bold mr-5">Category</label>
-                            <select name="category" defaultValue={'DEFAULT'} required className="select select-bordered w-full mt-3">
-
-                                <option value={'DEFAULT'} disabled>Category</option>
-                                <option value={'Animals'}>Animals</option>
-                                <option value={'Anime'}>Anime</option>
-                                <option value={'Comedy'}>Comedy</option>
-                                <option value={'Cartoon'}>Cartoon</option>
-                                <option value={'Education'}>Education</option>
-                                <option value={'Entertainment'}>Entertainment</option>
-                                <option value={'Fitness'}>Fitness</option>
-                                <option value={'Fashion'}>Fashion</option>
-                                <option value={'Food'}>Food</option>
-                                <option value={'Lifestyle'}>Lifestyle</option>
-                                <option value={'Music'}>Music</option>
-                                <option value={'Music'}>Movies</option>
-                                <option value={'Sports'}>Sports</option>
-                                <option value={'Travel'}>Travel</option>
-                                <option value={'Tech'}>Tech</option>
-                                <option value={'Video Game'}>Video Game</option>
-
-                            </select>
+                            <label htmlFor="detailed_description" className={labelClass}>Detailed Description</label>
+                            <p className="text-xs text-ink-faint mt-1 mb-2">The full body of the article.</p>
+                            <textarea
+                                required
+                                name="detailed_description"
+                                id="detailed_description"
+                                rows="12"
+                                placeholder="Write the full article here"
+                                className={fieldClass}></textarea>
                         </div>
                     </div>
-                    <input type="submit" className="btn bg-gray-900 text-white w-2/4 mx-auto font-bold" value="Submit" />
-                </form>
+
+                    {/* Metadata sidebar: everything that isn't the article body itself */}
+                    <div className="space-y-6 lg:border-l lg:border-rule lg:pl-8">
+                        <div>
+                            <label htmlFor="category" className={labelClass}>Category</label>
+                            <select name="category" id="category" defaultValue={'DEFAULT'} required className={`mt-2 ${fieldClass}`}>
+                                <option value={'DEFAULT'} disabled>Select a category</option>
+                                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="image" className={labelClass}>Image URL</label>
+                            <input
+                                required
+                                name="image"
+                                id="image"
+                                type="text"
+                                placeholder="https://"
+                                className={`mt-2 ${fieldClass}`} />
+                        </div>
+
+                        <div className="border-t border-rule pt-6">
+                            <label htmlFor="user_name" className={labelClass}>Author Name</label>
+                            <input
+                                required
+                                name="name"
+                                id="user_name"
+                                type="text"
+                                placeholder="User Name"
+                                className={`mt-2 ${fieldClass}`} />
+                        </div>
+
+                        <div>
+                            <label htmlFor="email" className={labelClass}>Author Email</label>
+                            <input
+                                required
+                                name="email"
+                                id="email"
+                                type="email"
+                                defaultValue={user ? user.email : ""}
+                                className={`mt-2 ${fieldClass}`} />
+                        </div>
+                    </div>
                 </div>
-            </section>
+
+                <div className="border-t border-rule pt-8">
+                    <input type="submit" className="border border-ink px-8 py-3 font-meta text-xs uppercase tracking-wide2 text-ink hover:bg-ink hover:text-paper transition-colors cursor-pointer" value="Publish" />
+                </div>
+            </form>
         </div>
     );
 };

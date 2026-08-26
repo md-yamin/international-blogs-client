@@ -2,6 +2,12 @@ import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2'
 import { AuthContext } from '../../context/AuthProvider';
+import { BlogDetailsSkeleton } from '../../Shared/Skeletons';
+
+const categories = ['Animals', 'Anime', 'Comedy', 'Cartoon', 'Education', 'Entertainment', 'Fitness', 'Fashion', 'Food', 'Lifestyle', 'Music', 'Movies', 'Sports', 'Travel', 'Tech', 'Video Game']
+
+const fieldClass = "w-full border border-rule bg-paper px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-ink transition-colors"
+const labelClass = "font-meta text-[11px] uppercase tracking-wide2 text-ink-faint"
 
 const UpdateBlog = () => {
 
@@ -10,23 +16,26 @@ const UpdateBlog = () => {
     const userEmail = user?.email
     const userImg = user?.photoURL
     const time = new Date()
-   
+
     console.log(id);
     const [blog, setBlog] = useState([])
-    useEffect(()=>{
-        fetch(`https://y-eta-nine.vercel.app/blogs/${id}`, {
-        method: 'GET'
-    })
-        .then(res => res.json())
-        .then(data => {
-            setBlog(data);
+    const [loading, setLoading] = useState(true)
+    useEffect(() => {
+        setLoading(true)
+        fetch(`https://international-blogs-server.vercel.app/blogs/${id}`, {
+            method: 'GET'
         })
-        .catch(
-            error => console.error(error)
-        )
-    },[setBlog,id])
+            .then(res => res.json())
+            .then(data => {
+                setBlog(data);
+                setLoading(false)
+            })
+            .catch(
+                error => console.error(error)
+            )
+    }, [id])
 
-        const { name, title, image, email, short_description, detailed_description, category } = blog
+    const { name, title, image, email, short_description, detailed_description, category } = blog
 
 
     const handleUpdateBlog = e => {
@@ -44,11 +53,7 @@ const UpdateBlog = () => {
 
         const newBlog = { name, title, image, email, short_description, detailed_description, category, userEmail, userImg, time }
 
-        
-
-
-
-        fetch(`https://y-eta-nine.vercel.app/blogs/${id}`, {
+        fetch(`https://international-blogs-server.vercel.app/blogs/${id}`, {
             method: 'PATCH',
             headers: {
                 'Content-type': 'application/json'
@@ -75,113 +80,101 @@ const UpdateBlog = () => {
 
     }
 
+    if (loading) {
+        return <BlogDetailsSkeleton />
+    }
+
     return (
-        <div>
-            <section className="p-6 dark:bg-gray-100 dark:text-gray-900" style={{ backgroundImage: 'url(https://i.ibb.co/w7PyjsY/5357377-Internet-go.jpg)', backgroundPosition: 'center' }}>
-                <form onSubmit={handleUpdateBlog} className="container flex flex-col mx-auto space-y-12  mb-20">
-                    <div className="grid grid-cols-2 gap-10 mt-20">
+        <div className="container mx-auto max-w-4xl px-6 py-14">
+            <p className={labelClass}>Editing</p>
+            <h1 className="mt-3 font-display italic text-4xl lg:text-5xl text-ink">{title}</h1>
 
+            <form onSubmit={handleUpdateBlog} className="mt-12 space-y-12">
+
+                <div>
+                    <label htmlFor="title" className={labelClass}>Title</label>
+                    <input
+                        name="title"
+                        id="title"
+                        type="text"
+                        placeholder="Title"
+                        defaultValue={title}
+                        className="mt-2 w-full border-b border-rule bg-transparent py-2 font-display text-3xl text-ink placeholder:text-ink-faint focus:outline-none focus:border-ink" />
+                </div>
+
+                <div className="grid gap-10 lg:grid-cols-3">
+                    <div className="lg:col-span-2 space-y-8">
                         <div>
-                            <label htmlFor="image" className="text-xl font-bold mr-5">Image Url</label>
-                            <input name="image" 
-                            id="image" type="text" 
-                            placeholder="Image Url" 
-                            defaultValue={image}
-                            className="input input-bordered w-full mt-3 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" />
-                        </div>
-
-
-
-                        <div>
-                            <label htmlFor="title" className="text-xl font-bold mr-5">Title</label>
-                            <input 
-                            name="title" 
-                            id="title" 
-                            type="text" 
-                            placeholder="Title" 
-                            defaultValue={title}
-                            className="input input-bordered w-full mt-3 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" />
-                        </div>
-
-                        <div>
-                            <label htmlFor="User Name" 
-                            className="text-xl font-bold mr-5">User Name</label>
-                            <input name="name" 
-                            id="user_name" 
-                            type="text" 
-                            placeholder="User Name" 
-                            defaultValue={name}
-                            className="input input-bordered w-full mt-3 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" />
+                            <label htmlFor="short_description" className={labelClass}>Short Description</label>
+                            <textarea
+                                name="short_description"
+                                id="short_description"
+                                rows="3"
+                                placeholder="Short Description"
+                                defaultValue={short_description}
+                                className={`mt-2 ${fieldClass}`}></textarea>
                         </div>
 
                         <div>
-                            <label htmlFor="User Email" className="text-xl font-bold mr-5">User Email</label>
-                            <input 
-                            name="email" 
-                            id="user_email" 
-                            type="email" 
-                            placeholder="User Email" 
-                            defaultValue={email}
-                            className="input input-bordered w-full mt-3 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" />
-                        </div>
-
-
-
-                        <div>
-                            <label htmlFor="short description" className="text-xl font-bold mr-5">Short Description</label>
-                            <textarea 
-                            name="short_description" 
-                            id="" 
-                            cols="50" 
-                            rows="10" 
-                            type="text" 
-                            placeholder="Short Description" 
-                            defaultValue={short_description}
-                            className="input input-bordered mt-3 h-28 w-full  focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" ></textarea>
-
-                        </div>
-
-                        <div>
-                            <label htmlFor="Detailed description" className="text-xl font-bold mr-5">Detailed Description</label>
-                            <textarea 
-                            name="detailed_description" 
-                            id="" 
-                            cols="50" 
-                            rows="10" 
-                            type="text" 
-                            placeholder="Detailed Description" 
-                            defaultValue={detailed_description}
-                            className="input input-bordered mt-3 w-full  h-28 focus:ring focus:ring-opacity-75 dark:text-gray-50 focus:dark:ring-violet-600 dark:border-gray-300" ></textarea>
-                        </div>
-
-                        <div>
-                            <label htmlFor="Category" className="text-xl font-bold mr-5">Category</label>
-                            <select name="category" defaultValue={category? category: 'DEFAULT'} required className="select select-bordered w-full mt-3">
-
-                                <option value={'DEFAULT'} disabled>Category</option>
-                                <option value={'Animals'}>Animals</option>
-                                <option value={'Anime'}>Anime</option>
-                                <option value={'Comedy'}>Comedy</option>
-                                <option value={'Cartoon'}>Cartoon</option>
-                                <option value={'Education'}>Education</option>
-                                <option value={'Entertainment'}>Entertainment</option>
-                                <option value={'Fitness'}>Fitness</option>
-                                <option value={'Fashion'}>Fashion</option>
-                                <option value={'Food'}>Food</option>
-                                <option value={'Lifestyle'}>Lifestyle</option>
-                                <option value={'Music'}>Music</option>
-                                <option value={'Music'}>Movies</option>
-                                <option value={'Sports'}>Sports</option>
-                                <option value={'Travel'}>Travel</option>
-                                <option value={'Tech'}>Tech</option>
-                                <option value={'Video Game'}>Video Game</option>
-
-                            </select>
+                            <label htmlFor="detailed_description" className={labelClass}>Detailed Description</label>
+                            <textarea
+                                name="detailed_description"
+                                id="detailed_description"
+                                rows="12"
+                                placeholder="Detailed Description"
+                                defaultValue={detailed_description}
+                                className={`mt-2 ${fieldClass}`}></textarea>
                         </div>
                     </div>
-                    <input type="submit" className="btn  bg-gray-900 text-white font-bold" value="Submit" />
-                </form>
-            </section>
+
+                    <div className="space-y-6 lg:border-l lg:border-rule lg:pl-8">
+                        <div>
+                            <label htmlFor="category" className={labelClass}>Category</label>
+                            <select name="category" id="category" defaultValue={category ? category : 'DEFAULT'} required className={`mt-2 ${fieldClass}`}>
+                                <option value={'DEFAULT'} disabled>Select a category</option>
+                                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="image" className={labelClass}>Image URL</label>
+                            <input
+                                name="image"
+                                id="image"
+                                type="text"
+                                placeholder="Image Url"
+                                defaultValue={image}
+                                className={`mt-2 ${fieldClass}`} />
+                        </div>
+
+                        <div className="border-t border-rule pt-6">
+                            <label htmlFor="user_name" className={labelClass}>Author Name</label>
+                            <input
+                                name="name"
+                                id="user_name"
+                                type="text"
+                                placeholder="User Name"
+                                defaultValue={name}
+                                className={`mt-2 ${fieldClass}`} />
+                        </div>
+
+                        <div>
+                            <label htmlFor="user_email" className={labelClass}>Author Email</label>
+                            <input
+                                name="email"
+                                id="user_email"
+                                type="email"
+                                placeholder="User Email"
+                                defaultValue={email}
+                                className={`mt-2 ${fieldClass}`} />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="border-t border-rule pt-8">
+                    <input type="submit" className="border border-ink px-8 py-3 font-meta text-xs uppercase tracking-wide2 text-ink hover:bg-ink hover:text-paper transition-colors cursor-pointer" value="Save Changes" />
+                </div>
+            </form>
         </div>
     );
 };
