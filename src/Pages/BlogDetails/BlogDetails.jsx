@@ -3,8 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { AuthContext } from "../../context/AuthProvider";
 import Swal from "sweetalert2";
 import { FaUserAlt } from "react-icons/fa";
-
-
+import BlogImage from "../../Shared/BlogImage";
+import { BlogDetailsSkeleton } from "../../Shared/Skeletons";
 
 const BlogDetails = () => {
     const { user } = useContext(AuthContext)
@@ -13,17 +13,20 @@ const BlogDetails = () => {
     const { id } = useParams()
     const [blog, setBlog] = useState([])
     const [comment, setComment] = useState([])
-    const { _id, name, image, detailed_description, category, title, userEmail } = blog
+    const [loading, setLoading] = useState(true)
+    const { _id, name, image, detailed_description, short_description, category, title, userEmail, userImg } = blog
     const blogId = _id
 
 
     useEffect(() => {
-        fetch(`https://y-eta-nine.vercel.app/blogs/${id}`, {
+        setLoading(true)
+        fetch(`https://international-blogs-server.vercel.app/blogs/${id}`, {
             method: 'GET'
         })
             .then(res => res.json())
             .then(data => {
                 setBlog(data);
+                setLoading(false)
             })
             .catch(
                 error => console.log(error)
@@ -32,7 +35,7 @@ const BlogDetails = () => {
 
 
     useEffect(() => {
-        fetch(`https://y-eta-nine.vercel.app/comments/${blogId}`, {
+        fetch(`https://international-blogs-server.vercel.app/comments/${blogId}`, {
             method: 'GET'
         })
             .then(res => res.json())
@@ -48,7 +51,7 @@ const BlogDetails = () => {
         e.preventDefault()
         const comment = e.target.comment.value
         const newComment = { comment, blogId, name, loggedEmail, loggedUserImg }
-        fetch(`https://y-eta-nine.vercel.app/comments`, {
+        fetch(`https://international-blogs-server.vercel.app/comments`, {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json'
@@ -71,66 +74,98 @@ const BlogDetails = () => {
             })
     }
 
-    return (
+    if (loading) {
+        return <BlogDetailsSkeleton />
+    }
 
-        <div className="bg-no-repeat bg-cover" style={{ backgroundImage: `url(${image})` }}>
-            <div className="bg-black bg-opacity-60 lg:pt-28">
-                <img className="text-center mx-auto rounded-lg w-3/4" src={image} alt="" />
-                <div className="mx-auto container w-3/4 space-y-5 lg:mt-10">
-                    <div className="flex justify-between">
-                        <h1 className="lg:text-4xl text-2xl font-bold text-white lg:mb-10">{title}</h1>
-                        <p className="text-white border-2 h-8 px-3">{category}</p>
+    return (
+        <article>
+            {/* Article header: category, title, byline sit above the image, editorial-style */}
+            <header className="container mx-auto max-w-3xl px-6 pt-12 lg:pt-20">
+                <p className="font-meta text-[11px] uppercase tracking-wide2 text-accent">{category}</p>
+                <h1 className="mt-4 font-display text-3xl lg:text-5xl leading-tight text-ink">{title}</h1>
+
+                <div className="mt-6 flex items-center justify-between border-t border-rule pt-5">
+                    <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 overflow-hidden rounded-full bg-paper-raised flex items-center justify-center shrink-0">
+                            {
+                                userImg ?
+                                    <img src={userImg} alt={name} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                                    :
+                                    <FaUserAlt className="text-ink-faint text-sm" />
+                            }
+                        </div>
+                        <p className="font-meta text-xs uppercase tracking-wide2 text-ink-soft">By {name}</p>
                     </div>
-                    <p className="text-white">{detailed_description}</p>
-                    <p className="lg:text-xl font-semibold text-white">Posted By: {name}</p>
                     {
-                        loggedEmail && loggedEmail === userEmail ?
-                        <Link to={`/update-blog/${_id}`}><button className="btn px-7 bg-white text-black lg:mb-10 lg:mt-10">Update</button></Link>
-                        :
-                        ''
+                        loggedEmail && loggedEmail === userEmail &&
+                        <Link to={`/update-blog/${_id}`} className="font-meta text-[11px] uppercase tracking-wide2 text-ink underline decoration-rule underline-offset-4 hover:decoration-ink transition-colors">
+                            Edit Article
+                        </Link>
                     }
                 </div>
+            </header>
 
+            {/* Hero image: this is the LCP element for the page, so it loads eagerly at high priority */}
+            <div className="container mx-auto max-w-5xl px-6 mt-8 lg:mt-10">
+                <BlogImage src={image} alt={title} aspect="aspect-[16/9]" priority={true} />
+            </div>
 
+            {/* Article body: comfortable reading width and line length, separate from the hero/meta above */}
+            <div className="container mx-auto max-w-2xl px-6 py-12 lg:py-16">
+                {
+                    short_description &&
+                    <p className="font-display italic text-xl text-ink-soft leading-relaxed border-l-2 border-accent pl-5 mb-8">
+                        {short_description}
+                    </p>
+                }
+                <p className="text-base leading-relaxed text-ink whitespace-pre-line">{detailed_description}</p>
+            </div>
 
-                <div className="mx-auto container w-3/4">
-                    <h2 className="lg:text-xl font-semibold text-white mb-5">Comments:</h2>
-                    <hr />
-                    <div>
-                        <h3 className="text-white mt-4">Comment made by:</h3>
-                        <p className="text-white mt-2 mb-4">This is a hardcoded comment</p>
-                    </div>
+            {/* Comments: visually separated from the article as a secondary section */}
+            <div className="bg-paper-raised">
+                <div className="container mx-auto max-w-2xl px-6 py-12 lg:py-16">
+                    <h2 className="font-meta text-[11px] uppercase tracking-wide2 text-ink-faint mb-8">
+                        Comments {comment.length > 0 && `(${comment.length})`}
+                    </h2>
+
                     {
-                        comment.map(comment => <div className="flex gap-5 items-center" key={comment._id}>
-                            <div className="avatar">
-                                <div className="rounded-full">
-                                    {
-                                        comment?.loggedUserImg == '' ? <img className="w-24 " src={comment?.loggedUserImg} /> :<FaUserAlt  className="text-black text-4xl w-full mx-auto"/>
-
-                                            
-
-                                    }
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="text-white mt-4">{comment?.name || comment?.email}</h3>
-                                <p className="text-white mt-2 mb-4">{comment?.comment}</p>
-                            </div>
-                        </div>)
-                    }
-                    <hr />
-                    {
-                        loggedEmail && loggedEmail !== userEmail ?
-                            <form onSubmit={handleComment} action="">
-                                <textarea className="w-full rounded-lg p-5 mt-5" name="comment" placeholder="Make a comment on this blog" rows={5}></textarea>
-                                <input className="btn btn-primary mb-5" type="submit" value="Submit" />
-                            </form>
+                        comment.length === 0 ?
+                            <p className="text-sm text-ink-soft mb-8">No comments yet.</p>
                             :
-                            <></>
+                            <div className="space-y-8 mb-10">
+                                {
+                                    comment.map(c => (
+                                        <div className="flex gap-4 items-start" key={c._id}>
+                                            <div className="h-9 w-9 overflow-hidden rounded-full bg-paper flex items-center justify-center shrink-0">
+                                                {
+                                                    c?.loggedUserImg ?
+                                                        <img className="h-full w-full object-cover" src={c.loggedUserImg} alt={c?.name || ''} loading="lazy" decoding="async" />
+                                                        :
+                                                        <FaUserAlt className="text-ink-faint text-sm" />
+                                                }
+                                            </div>
+                                            <div>
+                                                <h3 className="font-meta text-xs uppercase tracking-wide2 text-ink-soft">{c?.name || c?.email}</h3>
+                                                <p className="mt-1 text-sm leading-relaxed text-ink">{c?.comment}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                    }
+
+                    {
+                        loggedEmail && loggedEmail !== userEmail &&
+                        <form onSubmit={handleComment} className="border-t border-rule pt-8">
+                            <label htmlFor="comment" className="font-meta text-[11px] uppercase tracking-wide2 text-ink-faint">Leave a comment</label>
+                            <textarea id="comment" className="mt-3 w-full border border-rule bg-paper p-4 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:border-ink" name="comment" placeholder="Share your thoughts on this article" rows={4}></textarea>
+                            <input className="mt-4 border border-ink px-5 py-2 font-meta text-xs uppercase tracking-wide2 text-ink hover:bg-ink hover:text-paper transition-colors cursor-pointer" type="submit" value="Submit" />
+                        </form>
                     }
                 </div>
             </div>
-        </div>
+        </article>
     );
 };
 

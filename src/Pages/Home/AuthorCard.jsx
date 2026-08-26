@@ -20,7 +20,7 @@ const AuthorCard = (blog) => {
         <div>
             <div className="flex flex-col justify-center max-w-xs p-6 shadow-md rounded-xl sm:px-12 dark:bg-gray-50 dark:text-gray-800 mx-auto">
                 {
-                    userImg? <img src={userImg} alt="" className="w-32 h-32 mx-auto rounded-full dark:bg-gray-500 aspect-square" /> : <FaUserAlt  className="text-black text-4xl w-32 h-32 mx-auto rounded-full dark:bg-gray-500 aspect-square"/>
+                    userImg? <img src={userImg} alt="" loading="lazy" decoding="async" className="w-32 h-32 mx-auto rounded-full dark:bg-gray-500 aspect-square object-cover" /> : <FaUserAlt  className="text-black text-4xl w-32 h-32 mx-auto rounded-full dark:bg-gray-500 aspect-square"/>
                 }
                 <div className="space-y-4 text-center divide-y dark:divide-gray-300">
                     <div className="my-2 space-y-1">

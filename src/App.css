@@ -1,5 +1,8 @@
-@media (min-width: 768px) { 
-    .active {
-    font-weight: 700;
-    } 
-  }
+.active {
+  color: #233329;
+  font-weight: 600;
+}
+
+.active .nav-underline {
+  transform: scaleX(1);
+}

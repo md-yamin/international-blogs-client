@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthProvider';
 import { Link } from 'react-router-dom';
-
+import BlogImage from './BlogImage';
 
 const BlogCard = ({ blog, handleDelete, handleWishlist }) => {
 
@@ -10,36 +10,38 @@ const BlogCard = ({ blog, handleDelete, handleWishlist }) => {
     const { _id, title, image, short_description, category } = blog
 
     return (
-        <div>
-            <div className="card bg-base-300 shadow-xl image-full md:w-96 lg:w-[400px] mb-10 md:h-[600px] mx-auto relative">
-                <figure><img className="w-full" src={image} alt="Shoes" /></figure>
-                <div className="card-body">
-                    <div className="flex flex-col">
-                        <img className="rounded-lg h-52" src={image} alt="" />
-                        <div className="p-2">
-                            <div className='h-full'>
-                                <div className="flex justify-between items-center">
-                                    <h2 className='text-2xl font-bold text-white'>{title}</h2>
-                                    <h5 className='text-amber-300'>{category}</h5>
-                                </div>
-                                <p>{short_description}</p>
-                            </div>
-                            <div className="card-actions absolute bottom-10 gap-10">
-                                <Link to={`/blog-details/${_id}`}><button className="btn bg-white text-black">Details</button></Link>
-                                <button onClick={() => { handleWishlist(_id) }} className="btn  bg-white text-black">Wishlist</button>
-                                {
+        <article className="group">
+            <Link to={`/blog-details/${_id}`}>
+                <BlogImage src={image} alt={title} aspect="aspect-[4/3]" imgClassName="transition-transform duration-500 group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
+            </Link>
 
-                                    user?.email === blog.email ?
-                                        <button onClick={() => handleDelete(_id)} className="btn bg-white text-black">Delete</button>
-                                        :
-                                        <></>
-                                }
-                            </div>
-                        </div>
-                    </div>
+            <div className="mt-4">
+                <div className="flex items-center justify-between">
+                    <span className="font-meta text-[11px] uppercase tracking-wide2 text-accent">{category}</span>
+                </div>
+                <Link to={`/blog-details/${_id}`}>
+                    <h3 className="mt-2 font-display text-xl leading-snug text-ink group-hover:underline decoration-1 underline-offset-4">
+                        {title}
+                    </h3>
+                </Link>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft line-clamp-3">{short_description}</p>
+
+                <div className="mt-4 flex items-center gap-5 border-t border-rule pt-3">
+                    <Link to={`/blog-details/${_id}`} className="font-meta text-[11px] uppercase tracking-wide2 text-ink hover:text-accent transition-colors">
+                        Read
+                    </Link>
+                    <button onClick={() => handleWishlist(_id)} className="font-meta text-[11px] uppercase tracking-wide2 text-ink-soft hover:text-accent transition-colors">
+                        Wishlist
+                    </button>
+                    {
+                        user?.email === blog.email &&
+                        <button onClick={() => handleDelete(_id)} className="ml-auto font-meta text-[11px] uppercase tracking-wide2 text-ink-faint hover:text-red-700 transition-colors">
+                            Delete
+                        </button>
+                    }
                 </div>
             </div>
-        </div>
+        </article>
     );
 };
 

@@ -5,28 +5,33 @@ import BlogCard from '../../Shared/BlogCard';
 import { AuthContext } from '../../context/AuthProvider';
 import Swal from 'sweetalert2';
 import AuthorCard from './AuthorCard';
+import { BlogCardSkeletonGrid, Spinner } from '../../Shared/Skeletons';
 
 const Home = () => {
 
 
     const [blogs, setBlogs] = useState([])
+    const [loading, setLoading] = useState(true)
     const { user } = useContext(AuthContext)
     const wishEmail = user?.email
 
 
     useEffect(() => {
-        fetch('https://y-eta-nine.vercel.app/blogs/dateSorted', {
+        fetch('https://international-blogs-server.vercel.app/blogs/dateSorted', {
             method: 'GET'
         })
             .then(res => res.json())
-            .then(data => setBlogs(data))
+            .then(data => {
+                setBlogs(data)
+                setLoading(false)
+            })
     }, [])
 
 
     const [wish, setWish] = useState(null)
     const handleWishlist = (id) => {
 
-        (fetch(`https://y-eta-nine.vercel.app/blogs/${id}`, {
+        (fetch(`https://international-blogs-server.vercel.app/blogs/${id}`, {
             method: 'GET'
         })
             .then(res => res.json())
@@ -38,7 +43,7 @@ const Home = () => {
     }
     useEffect(() => {
         if (wish !== null) {
-            fetch(`https://y-eta-nine.vercel.app/wishlist`, {
+            fetch(`https://international-blogs-server.vercel.app/wishlist`, {
                 method: 'POST',
                 headers: {
                     'Content-type': 'application/json'
@@ -71,7 +76,7 @@ const Home = () => {
         })
 
         if (confirm) {
-            fetch(`https://y-eta-nine.vercel.app/blogs/${id}`, {
+            fetch(`https://international-blogs-server.vercel.app/blogs/${id}`, {
                 method: 'DELETE'
             })
                 .then(res => res.json())
@@ -101,23 +106,33 @@ const Home = () => {
                     <h2 className='lg:text-7xl text-2xl text-sky-950 drop-shadow-xl font-black w-full h-full flex justify-center items-center bg-cover bg-no-repeat font-serif' style={{ backgroundImage: 'url(https://i.ibb.co/tJGnRqx/9220705.jpg)' }}>Enjoy <br /><br /> <span>Quality</span> <br />Blogs</h2>
                 </div>
                 <div>
-                    <img className='w-full' src="https://i.ibb.co/3NpZqrb/47465.jpg" />
+                    <img className='w-full' src="https://i.ibb.co/3NpZqrb/47465.jpg" loading="lazy" decoding="async" />
                 </div>
             </Carousel>
 
             <h2 className='text-center text-2xl md:text-5xl font-black'>Recent Posts</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 lg:gap-y-7 lg:gap-x-14">
-                {
-                    blogs.map(blog => <BlogCard key={blog._id} blog={blog} handleDelete={handleDelete} handleWishlist={handleWishlist}></BlogCard>)
-                }
-            </div>
+            {
+                loading ?
+                    <BlogCardSkeletonGrid count={6} />
+                    :
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 lg:gap-y-7 lg:gap-x-14">
+                        {
+                            blogs.map(blog => <BlogCard key={blog._id} blog={blog} handleDelete={handleDelete} handleWishlist={handleWishlist}></BlogCard>)
+                        }
+                    </div>
+            }
 
             <h2 className='text-center text-2xl md:text-5xl font-black'>Subscribe To Authors</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 lg:gap-y-7 lg:gap-x-14">
-                {
-                    blogs.map(blog => <AuthorCard key={blog._id} blog={blog}></AuthorCard>)
-                }
-            </div>
+            {
+                loading ?
+                    <Spinner label="Loading authors" />
+                    :
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 md:gap-3 lg:gap-y-7 lg:gap-x-14">
+                        {
+                            blogs.map(blog => <AuthorCard key={blog._id} blog={blog}></AuthorCard>)
+                        }
+                    </div>
+            }
 
             <h2 className='text-center text-2xl md:text-5xl font-black'>Join Us With</h2>
             <div>

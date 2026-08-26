@@ -13,7 +13,7 @@ Client Side Website Live Link: https://international-blogs.web.app
 <br/>
 Client Side Github Link: https://github.com/md-yamin/international-blogs-client.git
 
-Server Side Live Link: https://y-eta-nine.vercel.app
+Server Side Live Link: https://international-blogs-server.vercel.app
 <br/>
 Server Side Github Link: https://github.com/md-yamin/international-blogs-server.git
 
@@ -30,7 +30,7 @@ If you want to clone this website you would need to clone both the client and se
   Ensure you add your Firebase environment variables to a .env file in the root directory.
   
 4. Update Request URLs:<br/>
-  Replace all request URLs from https://y-eta-nine.vercel.app to the URL where your server is hosted. If running the server locally, use 
+  Replace all request URLs from https://international-blogs-server.vercel.app to the URL where your server is hosted. If running the server locally, use 
   http://localhost:5000.
   
 5.Clone the Server-Side Repository:<br/>
